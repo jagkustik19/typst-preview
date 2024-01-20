@@ -3372,6 +3372,7 @@ dependencies = [
  "env_logger",
  "futures",
  "hyper",
+ "indexmap 2.1.0",
  "log",
  "memmap2 0.7.1",
  "notify",

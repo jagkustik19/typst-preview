@@ -1,11 +1,13 @@
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use log::{debug, info, trace};
 use serde::Deserialize;
 use tokio::sync::{broadcast, mpsc, watch};
 use typst::model::Document;
-use typst_ts_core::debug_loc::SourceSpanOffset;
+use typst_ts_core::{debug_loc::SourceSpanOffset, TypstDocument};
 use typst_ts_svg_exporter::IncrSvgDocServer;
+
+use crate::{debug_loc::SpanInterner, outline::Outline};
 
 use super::{editor::EditorActorRequest, typst::TypstActorRequest, webview::WebviewActorRequest};
 
@@ -165,6 +167,8 @@ pub struct OutlineRenderActor {
     signal: broadcast::Receiver<RenderActorRequest>,
     document: watch::Receiver<Option<Arc<Document>>>,
     editor_tx: mpsc::UnboundedSender<EditorActorRequest>,
+
+    span_interner: Arc<RwLock<SpanInterner>>,
 }
 
 impl OutlineRenderActor {
@@ -172,11 +176,13 @@ impl OutlineRenderActor {
         signal: broadcast::Receiver<RenderActorRequest>,
         document: watch::Receiver<Option<Arc<Document>>>,
         editor_tx: mpsc::UnboundedSender<EditorActorRequest>,
+        span_interner: Arc<RwLock<SpanInterner>>,
     ) -> Self {
         Self {
             signal,
             document,
             editor_tx,
+            span_interner,
         }
     }
 
@@ -211,7 +217,7 @@ impl OutlineRenderActor {
                 info!("OutlineRenderActor: document is not ready");
                 continue;
             };
-            let data = crate::outline::outline(&document);
+            let data = self.outline(&document);
             comemo::evict(30);
             debug!("OutlineRenderActor: sending outline");
             let Ok(_) = self.editor_tx.send(EditorActorRequest::Outline(data)) else {
@@ -220,5 +226,11 @@ impl OutlineRenderActor {
             };
         }
         info!("OutlineRenderActor: exiting")
+    }
+
+    fn outline(&mut self, document: &TypstDocument) -> Outline {
+        let mut span_interner = self.span_interner.write().unwrap();
+        span_interner.reset();
+        crate::outline::outline(&mut span_interner, document)
     }
 }
