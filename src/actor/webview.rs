@@ -5,10 +5,10 @@ use tokio::{
     sync::{broadcast, mpsc},
 };
 use tokio_tungstenite::{tungstenite::Message, WebSocketStream};
+use typst_ts_core::debug_loc::DocumentPosition;
 use typst_ts_core::vector::span_id_from_u64;
 
 use super::{render::RenderActorRequest, typst::TypstActorRequest};
-use crate::debug_loc::DocumentPosition;
 
 // pub type CursorPosition = DocumentPosition;
 pub type SrcToDocJumpInfo = DocumentPosition;
