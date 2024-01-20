@@ -898,7 +898,7 @@ checksum = "020e203f177c0fb250fb19455a252e838d2bbbce1f80f25ecc42402aafa8cd38"
 dependencies = [
  "fontconfig-parser",
  "log",
- "memmap2 0.8.0",
+ "memmap2",
  "slotmap",
  "tinyvec",
  "ttf-parser",
@@ -1752,15 +1752,6 @@ name = "memchr"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "523dc4f511e55ab87b694dc30d0f820d60906ef06413f93d4d7a1385599cc149"
-
-[[package]]
-name = "memmap2"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f49388d20533534cd19360ad3d6a7dadc885944aa802ba3995040c5ec11288c6"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "memmap2"
@@ -3361,28 +3352,19 @@ name = "typst-preview"
 version = "0.10.6"
 dependencies = [
  "anyhow",
- "chrono",
  "clap",
  "clap_complete",
  "clap_mangen",
- "codespan-reporting",
  "comemo",
- "dirs",
- "elsa",
  "env_logger",
  "futures",
  "hyper",
  "indexmap 2.1.0",
  "log",
- "memmap2 0.7.1",
- "notify",
  "once_cell",
  "open",
- "same-file",
  "serde",
  "serde_json",
- "siphasher 1.0.0",
- "tiny-skia",
  "tokio",
  "tokio-tungstenite",
  "typst",
@@ -3390,7 +3372,6 @@ dependencies = [
  "typst-ts-core",
  "typst-ts-svg-exporter",
  "vergen",
- "walkdir",
 ]
 
 [[package]]
