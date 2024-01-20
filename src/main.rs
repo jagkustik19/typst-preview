@@ -7,7 +7,7 @@ use typst_ts_compiler::service::CompileDriver;
 use typst_ts_compiler::TypstSystemWorld;
 use typst_ts_core::config::CompileOpts;
 
-use crate::ts_compiler::CompileServer;
+use crate::compiler::CompileServer;
 
 use hyper::{
     service::{make_service_fn, service_fn},
@@ -16,7 +16,7 @@ use hyper::{
 
 use typst_preview::{preview, CliArguments, PreviewMode, Previewer};
 
-mod ts_compiler;
+mod compiler;
 
 pub fn make_static_host(
     previewer: &Previewer,
