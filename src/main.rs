@@ -1,3 +1,5 @@
+use std::{borrow::Cow, net::SocketAddr};
+
 use clap::Parser;
 use log::{error, info};
 
@@ -5,12 +7,16 @@ use typst_ts_compiler::service::CompileDriver;
 use typst_ts_compiler::TypstSystemWorld;
 use typst_ts_core::config::CompileOpts;
 
+use crate::ts_compiler::CompileServer;
+
 use hyper::{
     service::{make_service_fn, service_fn},
     Error,
 };
 
 use typst_preview::{preview, CliArguments, PreviewMode, Previewer};
+
+mod ts_compiler;
 
 pub fn make_static_host(
     previewer: &Previewer,
@@ -106,7 +112,12 @@ async fn main() {
         std::process::exit(0);
     });
 
-    let previewer = preview(arguments.preview, compiler_driver).await;
+    let previewer = preview(arguments.preview, move |handle| {
+        let compile_server = CompileServer::new(compiler_driver, handle);
+
+        compile_server.spawn().unwrap()
+    })
+    .await;
 
     let static_file_addr = arguments.static_file_host;
     let mode = arguments.preview_mode;
@@ -120,8 +131,6 @@ async fn main() {
     }
     let _ = tokio::join!(previewer.join(), static_server_handle);
 }
-
-use std::{borrow::Cow, net::SocketAddr};
 
 pub static EMBEDDED_FONT: &[Cow<'_, [u8]>] = &[
     // Embed default fonts.
